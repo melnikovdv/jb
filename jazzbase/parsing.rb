@@ -27,6 +27,3 @@ end
 arr = parseSingers
 puts arr[0]
 puts 'Length of singers array: ' + arr.length.to_s
-
-s = "12345"
-puts s.gsub("3", '0')
