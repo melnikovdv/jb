@@ -19,12 +19,14 @@ def parseSingers
 
 	arr = Array.new
 	doc.css('ul#ispol li a').each do |link| 
-		arr.push Singer.new(link.content, link[:href])		
+		arr.push Singer.new(link.content, link[:href].gsub('../', 'http://jazzbase.ru/'))		
 	end	
 	return arr
 end
 
 arr = parseSingers
-puts arr
-#puts arr
+puts arr[0]
 puts 'Length of singers array: ' + arr.length.to_s
+
+s = "12345"
+puts s.gsub("3", '0')
