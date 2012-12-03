@@ -31,10 +31,9 @@ def parseSingerDescription(singer)
   singer.descr = doc.xpath('//html/body/table/tr[3]/td[2]/table/tr[3]/td/pre')[0].content     
   singer.imgTag = doc.xpath('//html/body/table/tr[3]/td[2]/table/tr[2]/td/table/td/img')[0].to_s.gsub('../', 'http://jazzbase.ru/')
 
-  puts doc.xpath('/html/body/table/tr[3]/td[2]/table/tr[2]/td/table/tr/td[2]/ul[1]//li')[0].content
-  #               /html/body/table/tr[3]/td[2]/table/tr[2]/td/table/tr/td[2]/ul[1]
-  doc.xpath('/html/body/table/tr[3]/td[2]/table/tr[2]/td/table/tr/td[2]/ul[1]//li').each do |el|
-  	puts el.class
+  puts doc.xpath('/html/body/table/tr[3]/td[2]/table/tr[2]/td/table/td[2]/ul[1]/li')[0].content
+  doc.xpath('/html/body/table/tr[3]/td[2]/table/tr[2]/td/table/td[2]/ul[1]/li').each do |el|
+  	puts el.content
   end
 
 #tr[3]/td[2]/table/tr[2]/td/table/tr/td[1]/img
