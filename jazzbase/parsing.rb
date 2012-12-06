@@ -2,14 +2,14 @@ require 'nokogiri'
 require 'open-uri'
 
 =begin 
-  
-  todo:    
-    # output to XML
+
+  todo:        
     # download singer image
     # download album image
   
   done:
     # refactor loading of Singer (throught link in constructor)
+    # output to XML
 
 =end
 
@@ -28,14 +28,17 @@ class Singer
       doc.xpath(xPath + '/tr[2]/td/table/td[2]/ul[1]/li/a').each do |el|
         @albums.push(Album.new(el[:href].subLink))
       end                
-      
+      @styles = Array.new
+      doc.xpath(xPath + '/tr[2]/td/table/td[2]/ul[3]/li/a').each do |el|
+        @styles.push(el.content)
+      end
   end
 
   def to_s
     return @name + " [" + @link + "]: img = " + @img
   end
 
-  attr_reader :name, :link, :descr, :img, :albums  
+  attr_reader :name, :link, :descr, :img, :albums, :styles
 end
 
 class Album
@@ -48,7 +51,11 @@ class Album
     @name = doc.xpath(xPath + '/tr[1]/td/h3')[0].content
     @year = doc.xpath(xPath + '/tr[2]/td/table/td[2]/ul[2]/li/a')[0].content    
     @img = doc.xpath(xPath + '/tr[2]/td/table/td[1]/img')[0][:src].subLink
-    @descr = doc.xpath(xPath + '/tr[3]/td/pre')[0].content
+    
+    descrNode = doc.xpath(xPath + '/tr[3]/td/pre')[0]
+    if descrNode
+      @descr = descrNode.content
+    end
   end
 
   def to_s
@@ -71,14 +78,64 @@ def parseSingers
     doc = Nokogiri::HTML(open(uri)) 
 
     arr = Array.new
+    i = 0
     doc.css('ul#ispol li a').each do |link| 
         arr.push Singer.new(link[:href].subLink)
-        break
+        #break
+        puts i
+        i += 1        
     end 
     return arr
 end
 
-arr = parseSingers
-puts 'Length of singers array: ' + arr.length.to_s
-puts arr[0]
-puts arr[0].albums
+def makeXML(singers)
+  doc = Nokogiri::XML::Document.new()
+  root = doc.create_element "jazzbase"
+  doc.add_child root
+  singers.each do |singer|
+    singerNode = doc.create_element "singer"
+    root.add_child singerNode
+
+    singerNode['name'] = singer.name
+    singerNode['img'] = singer.img
+
+    descrNode = doc.create_element "description"
+    singerNode.add_child descrNode
+    descrNode.content = singer.descr
+
+    stylesNode = doc.create_element "styles"
+    singerNode.add_child stylesNode
+
+    singer.styles.each do |style|
+      styleNode = doc.create_element "style"
+      stylesNode.add_child styleNode
+      styleNode.content = style
+    end
+
+    albumsNode = doc.create_element "albums"
+    singerNode.add_child albumsNode
+
+    singer.albums.each do |album|
+      albumNode = doc.create_element "album"
+      albumsNode.add_child albumNode
+      albumNode['name'] = album.name
+      albumNode['year'] = album.year
+      albumNode['img'] = album.img
+      albumNode.content = album.descr
+    end
+
+  end
+  
+  File.open('jazzbase.xml', 'w') do |f|
+    f.puts doc.to_xml(:encoding => 'UTF-8')      
+  end
+
+  doc.to_s  
+end
+
+singers = parseSingers
+puts 'Length of singers array: ' + singers.length.to_s
+#puts singers[0].styles
+#puts arr[0].albums
+puts makeXML(singers)
+
