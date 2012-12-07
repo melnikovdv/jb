@@ -1,5 +1,6 @@
 require 'nokogiri'
 require 'open-uri'
+require "yaml"
 
 =begin 
 
@@ -9,11 +10,45 @@ require 'open-uri'
     # make increment site parsing to xml file
     # make create xml nodes from objects    
     # save id from jazzbase and meka own ids
+    # switch to yaml
   done:
     # refactor loading of Singer (throught link in constructor)
     # output to XML
 
 =end
+
+XML_BASE = 'jazzbase.xml'
+YAML_BASE = 'jazzbase.yml'
+
+class Singers
+  include Enumerable
+  
+  def self.load(file)
+    if File.file?(file)
+      f = open(file)
+      return YAML::load(f)
+    else
+      nil
+    end
+  end
+
+  def initialize(file)
+    @singers = Array.new      
+  end
+
+  def each(&block)
+    @singers.each(&block)  
+  end 
+
+  def push(singer)
+    @singers.push singer
+  end
+
+  def [] index
+    return @singers[index]
+  end
+
+end
 
 class Singer
   
@@ -90,20 +125,6 @@ class String
 
 end
 
-def parseSingers
-    uri = 'http://jazzbase.ru/people/765.htm'   
-    doc = Nokogiri::HTML(open(uri)) 
-
-    arr = Array.new
-    i = 0
-    doc.css('ul#ispol li a').each do |link|         
-        singer = Singer.new(link[:href].subLink)
-        arr.push singer
-        puts i.to_s + " " + singer.name
-        i += 1        
-    end 
-    return arr
-end
 
 def makeXML(singers)
   doc = Nokogiri::XML::Document.new()
@@ -139,15 +160,34 @@ def makeXML(singers)
       albumNode['year'] = album.year
       albumNode['img'] = album.img
       albumNode.content = album.descr
-    end
-
-  end
+    end    
+  end  
   
-  File.open('jazzbase.xml', 'w') do |f|
+  File.open(XML_BASE, 'w') do |f|
     f.puts doc.to_xml(:encoding => 'UTF-8')      
   end
 
   doc.to_s  
+end
+
+def parseSingers
+    uri = 'http://jazzbase.ru/people/765.htm'   
+    doc = Nokogiri::HTML(open(uri)) 
+
+    singers = Singers.load(YAML_BASE)
+    puts singers[0]
+    puts singers[0].descr
+
+    singers = Array.new
+    i = 0
+    doc.css('ul#ispol li a').each do |link|         
+        singer = Singer.new(link[:href].subLink)
+        singers.push singer
+        puts i.to_s + " " + singer.name
+        i += 1        
+        break
+    end 
+    return singers
 end
 
 #singer = Singer.new('http://jazzbase.ru/people/3544.htm')
@@ -157,5 +197,9 @@ singers = parseSingers
 puts 'Length of singers array: ' + singers.length.to_s
 #puts singers[0].styles
 #puts arr[0].albums
-puts makeXML(singers)
+#puts makeXML(singers)
+
+# File.open(YAML_BASE + '.yml', 'w') do |f|
+#   f.puts singers.to_yaml      
+# end  
 
