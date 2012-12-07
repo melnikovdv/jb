@@ -53,30 +53,32 @@ end
 class Singer
   
   def initialize(link)
-      doc = Nokogiri::HTML(open(link))
-      @link = link
-
       xPath = '/html/body/table/tr[3]/td[2]/table'
 
-      @name = doc.xpath(xPath + '/tr[1]/td/h3')[0].content      
+      doc = Nokogiri::HTML(open(link))
       
+      @name = doc.xpath(xPath + '/tr[1]/td/h3')[0].content      
+      @link = link   
+        
+      imgNode = doc.xpath(xPath + '/tr[2]/td/table/td/img')[0]
+      if imgNode
+        @img = imgNode[:src].to_s.subLink      
+      end
+
+      @styles = Array.new
+      doc.xpath(xPath + '/tr[2]/td/table/td[2]/ul[3]/li/a').each do |el|
+        @styles.push(el.content)
+      end
+
       descrNode = doc.xpath(xPath + '/tr[3]/td/pre')[0]
       if descrNode
         @descr = descrNode.content     
       end
       
-      imgNode = doc.xpath(xPath + '/tr[2]/td/table/td/img')[0]
-      if imgNode
-        @img = imgNode[:src].to_s.subLink      
-      end
       @albums = Array.new
       doc.xpath(xPath + '/tr[2]/td/table/td[2]/ul[1]/li/a').each do |el|
         @albums.push(Album.new(el[:href].subLink))
-      end                
-      @styles = Array.new
-      doc.xpath(xPath + '/tr[2]/td/table/td[2]/ul[3]/li/a').each do |el|
-        @styles.push(el.content)
-      end
+      end                      
   end
 
   def to_s
@@ -89,11 +91,12 @@ end
 class Album
   
   def initialize(link)
+    xPath = '/html/body/table/tr[3]/td[2]/table'
+    
     doc = Nokogiri::HTML(open(link))
 
-    xPath = '/html/body/table/tr[3]/td[2]/table'
-
     @name = doc.xpath(xPath + '/tr[1]/td/h3')[0].content
+
     yearNode = doc.xpath(xPath + '/tr[2]/td/table/td[2]/ul[2]/li/a')[0]
     if yearNode 
       @year = yearNode.content    
