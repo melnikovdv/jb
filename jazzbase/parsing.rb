@@ -1,38 +1,39 @@
 require 'nokogiri'
 require 'open-uri'
-require "yaml"
+require 'yaml'
 
 =begin 
 
   todo:        
-    # download singer image
-    # download album image
-    # make increment site parsing to xml file
-    # make create xml nodes from objects    
-    # save id from jazzbase and meka own ids
-    # switch to yaml
+    # download singer's images and album's images
+    # refactor plain parsing procedure to Singers class
   done:
+    # switch to yaml
+    # make increment site parsing to file
+    # save id from jazzbase
     # refactor loading of Singer (throught link in constructor)
     # output to XML
 
 =end
 
-XML_BASE = 'jazzbase.xml'
 YAML_BASE = 'jazzbase.yml'
 
 class Singers
   include Enumerable
   
   def self.load(file)
+    puts File.extname(file)
     if File.file?(file)
-      f = open(file)
-      return YAML::load(f)
+        p 'file ' + file + ' found'
+        f = open(file)
+        return YAML::load(f)
     else
-      nil
+      p 'file ' + file + ' not found'
+      return nil
     end
   end
 
-  def initialize(file)
+  def initialize()
     @singers = Array.new      
   end
 
@@ -44,53 +45,79 @@ class Singers
     @singers.push singer
   end
 
+  def delete(singer)
+    @singers.delete singer
+  end
+
+  def length
+    return @singers.length
+  end
+
   def [] index
     return @singers[index]
   end
 
+  def byId(id) 
+    @singers.each do |element|
+      if element.id.eql?(id) 
+        return element
+      end 
+    end
+    return nil
+  end
 end
 
 class Singer
   
   def initialize(link)
-      xPath = '/html/body/table/tr[3]/td[2]/table'
+    @id = link.jazzbaseId
 
-      doc = Nokogiri::HTML(open(link))
+    xPath = '/html/body/table/tr[3]/td[2]/table'
+
+    doc = Nokogiri::HTML(open(link))
+    
+    @name = doc.xpath(xPath + '/tr[1]/td/h3')[0].content      
+    @link = link   
       
-      @name = doc.xpath(xPath + '/tr[1]/td/h3')[0].content      
-      @link = link   
-        
-      imgNode = doc.xpath(xPath + '/tr[2]/td/table/td/img')[0]
-      if imgNode
-        @img = imgNode[:src].to_s.subLink      
-      end
+    imgNode = doc.xpath(xPath + '/tr[2]/td/table/td/img')[0]
+    if imgNode
+      @img = imgNode[:src].to_s.subLink      
+    end
 
-      @styles = Array.new
-      doc.xpath(xPath + '/tr[2]/td/table/td[2]/ul[3]/li/a').each do |el|
-        @styles.push(el.content)
-      end
+    @styles = Array.new
+    doc.xpath(xPath + '/tr[2]/td/table/td[2]/ul[3]/li/a').each do |el|
+      @styles.push(el.content)
+    end
 
-      descrNode = doc.xpath(xPath + '/tr[3]/td/pre')[0]
-      if descrNode
-        @descr = descrNode.content     
-      end
-      
-      @albums = Array.new
-      doc.xpath(xPath + '/tr[2]/td/table/td[2]/ul[1]/li/a').each do |el|
-        @albums.push(Album.new(el[:href].subLink))
-      end                      
+    descrNode = doc.xpath(xPath + '/tr[3]/td/pre')[0]
+    if descrNode
+      @descr = descrNode.content     
+    end
+    
+    @albums = Array.new
+    doc.xpath(xPath + '/tr[2]/td/table/td[2]/ul[1]/li/a').each do |el|
+      @albums.push(Album.new(el[:href].subLink))
+    end       
+
+    @loaded = true               
+  end
+  
+  def loaded?
+    return @loaded
   end
 
   def to_s
-    return @name + " [" + @link + "]: img = " + @img
+    return @id + ':' + @name + " [" + @link + "]: img = " + @img
   end
 
-  attr_reader :name, :link, :descr, :img, :albums, :styles
+  attr_reader :id, :name, :link, :descr, :img, :albums, :styles
 end
 
 class Album
   
   def initialize(link)
+    @id = link.jazzbaseId
+
     xPath = '/html/body/table/tr[3]/td[2]/table'
     
     doc = Nokogiri::HTML(open(link))
@@ -114,10 +141,10 @@ class Album
   end
 
   def to_s
-    return @name + " [" + @year + "]: img = " + @img
+    return @id + ':' + @name + " [" + @year + "]: img = " + @img
   end
 
-  attr_reader :name, :year, :img, :descr
+  attr_reader :id, :name, :year, :img, :descr
 end
 
 class String
@@ -126,83 +153,60 @@ class String
     return gsub('../', 'http://jazzbase.ru/')
   end
 
-end
-
-
-def makeXML(singers)
-  doc = Nokogiri::XML::Document.new()
-  root = doc.create_element "jazzbase"
-  doc.add_child root
-  singers.each do |singer|
-    singerNode = doc.create_element "singer"
-    root.add_child singerNode
-
-    singerNode['name'] = singer.name
-    singerNode['img'] = singer.img
-
-    descrNode = doc.create_element "description"
-    singerNode.add_child descrNode
-    descrNode.content = singer.descr
-
-    stylesNode = doc.create_element "styles"
-    singerNode.add_child stylesNode
-
-    singer.styles.each do |style|
-      styleNode = doc.create_element "style"
-      stylesNode.add_child styleNode
-      styleNode.content = style
-    end
-
-    albumsNode = doc.create_element "albums"
-    singerNode.add_child albumsNode
-
-    singer.albums.each do |album|
-      albumNode = doc.create_element "album"
-      albumsNode.add_child albumNode
-      albumNode['name'] = album.name
-      albumNode['year'] = album.year
-      albumNode['img'] = album.img
-      albumNode.content = album.descr
-    end    
-  end  
-  
-  File.open(XML_BASE, 'w') do |f|
-    f.puts doc.to_xml(:encoding => 'UTF-8')      
+  def jazzbaseId
+    return self[/(\d)+/]
   end
 
-  doc.to_s  
 end
 
 def parseSingers
-    uri = 'http://jazzbase.ru/people/765.htm'   
-    doc = Nokogiri::HTML(open(uri)) 
+  uri = 'http://jazzbase.ru/people/765.htm'   
+  doc = Nokogiri::HTML(open(uri)) 
 
-    singers = Singers.load(YAML_BASE)
-    puts singers[0]
-    puts singers[0].descr
+  singers = Singers.load(YAML_BASE)
+  if singers == nil
+    puts 'new Singers class created'
+    singers = Singers.new
+  end
 
-    singers = Array.new
-    i = 0
-    doc.css('ul#ispol li a').each do |link|         
-        singer = Singer.new(link[:href].subLink)
+  i = 0
+  doc.css('ul#ispol li a').each do |link|         
+    singerLink = link[:href].subLink
+    id = singerLink.jazzbaseId
+    singer = singers.byId(id)
+
+    if !singer
+      singer = Singer.new singerLink
+      singers.push singer
+      puts i.to_s + ". " + singer.id + ' ' + singer.name + ' was added as new'
+      if i % 100 == 0
+        store(singers)
+      end
+    else
+      puts i.to_s + ". " + singer.id + ' ' + singer.name + ' was already in the base'
+      if !singer.loaded?
+        singers.delete singer 
+        singer = Singer.new singerLink
         singers.push singer
-        puts i.to_s + " " + singer.name
-        i += 1        
-        break
+        puts 'not loaded'
+      end  
     end 
-    return singers
+    
+    i += 1        
+  end 
+  store(singers)
+  return singers
 end
 
-#singer = Singer.new('http://jazzbase.ru/people/3544.htm')
-# singer = Singer.new('http://jazzbase.ru/people/11805.htm')
-# puts singer
+def store(singers)
+  time = Time.new
+  puts 'saving to file started at ' + time.inspect 
+  File.open(YAML_BASE, 'w') do |f|
+    f.puts singers.to_yaml      
+  end
+  time = Time.new
+  puts 'saving to file finished at ' + time.inspect
+end
+
 singers = parseSingers
 puts 'Length of singers array: ' + singers.length.to_s
-#puts singers[0].styles
-#puts arr[0].albums
-#puts makeXML(singers)
-
-# File.open(YAML_BASE + '.yml', 'w') do |f|
-#   f.puts singers.to_yaml      
-# end  
-
