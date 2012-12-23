@@ -21,7 +21,56 @@ YAML_BASE = 'jazzbase.yml'
 class Singers
   include Enumerable
   
-  def self.load(file)
+  def self.parse
+    uri = 'http://jazzbase.ru/people/765.htm'   
+    doc = Nokogiri::HTML(open(uri)) 
+
+    singers = Singers.restore(YAML_BASE)
+    if !singers
+      puts 'new Singers class created'
+      singers = Singers.new
+    end
+
+    i = 0
+    doc.css('ul#ispol li a').each do |link|         
+      singerLink = link[:href].subLink
+      id = singerLink.jazzbaseId
+      singer = singers.byId(id)
+
+      if !singer
+        singer = Singer.new singerLink
+        singers.push singer
+        puts i.to_s + ". " + singer.id + ' ' + singer.name + ' was added as new'
+        if i % 100 == 0
+          Singers.store(singers)
+        end
+      else
+        puts i.to_s + ". " + singer.id + ' ' + singer.name + ' was already in the base'
+        if !singer.loaded?
+          singers.delete singer 
+          singer = Singer.new singerLink
+          singers.push singer
+          puts 'not loaded'
+        end  
+      end 
+      
+      i += 1        
+    end 
+    Singers.store(singers)
+    return singers    
+  end
+
+  def self.store(singers)
+    time = Time.new
+    puts 'saving to file started at ' + time.inspect 
+    File.open(YAML_BASE, 'w') do |f|
+      f.puts singers.to_yaml      
+    end
+    time = Time.new
+    puts 'saving to file finished at ' + time.inspect
+  end
+
+  def self.restore(file)
     puts File.extname(file)
     if File.file?(file)
         p 'file ' + file + ' found'
@@ -159,54 +208,5 @@ class String
 
 end
 
-def parseSingers
-  uri = 'http://jazzbase.ru/people/765.htm'   
-  doc = Nokogiri::HTML(open(uri)) 
-
-  singers = Singers.load(YAML_BASE)
-  if singers == nil
-    puts 'new Singers class created'
-    singers = Singers.new
-  end
-
-  i = 0
-  doc.css('ul#ispol li a').each do |link|         
-    singerLink = link[:href].subLink
-    id = singerLink.jazzbaseId
-    singer = singers.byId(id)
-
-    if !singer
-      singer = Singer.new singerLink
-      singers.push singer
-      puts i.to_s + ". " + singer.id + ' ' + singer.name + ' was added as new'
-      if i % 100 == 0
-        store(singers)
-      end
-    else
-      puts i.to_s + ". " + singer.id + ' ' + singer.name + ' was already in the base'
-      if !singer.loaded?
-        singers.delete singer 
-        singer = Singer.new singerLink
-        singers.push singer
-        puts 'not loaded'
-      end  
-    end 
-    
-    i += 1        
-  end 
-  store(singers)
-  return singers
-end
-
-def store(singers)
-  time = Time.new
-  puts 'saving to file started at ' + time.inspect 
-  File.open(YAML_BASE, 'w') do |f|
-    f.puts singers.to_yaml      
-  end
-  time = Time.new
-  puts 'saving to file finished at ' + time.inspect
-end
-
-singers = parseSingers
+singers = Singers.parse
 puts 'Length of singers array: ' + singers.length.to_s
