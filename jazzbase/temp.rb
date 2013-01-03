@@ -43,3 +43,27 @@ def makeXML(singers)
 
   doc.to_s  
 end
+
+require './singers'
+
+singers = Singers.restore(YAML_BASE)
+d = Hash.new(0)
+singers.each do |singer|
+  d[singer.id] += 1
+  singer.albums.each do |album|
+    d[album.id] += 1
+  end
+end
+
+dc = 0
+d.each_pair do |key, value|
+
+  if value > 1
+    puts 'key: ' + key.to_s + '; value = ' + value.to_s
+    dc += 1
+  end  
+end
+
+puts dc
+
+
