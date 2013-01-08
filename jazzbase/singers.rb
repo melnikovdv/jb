@@ -125,7 +125,7 @@ class Singer
 
     doc = Nokogiri::HTML(open(link))
     
-    @name = doc.xpath(xPath + '/tr[1]/td/h3')[0].content      
+    @name = doc.xpath(xPath + '/tr[1]/td/h3')[0].content.encode('utf-8')       
     @link = link   
       
     imgNode = doc.xpath(xPath + '/tr[2]/td/table/td/img')[0]
@@ -136,17 +136,17 @@ class Singer
 
     @instruments = Array.new
     doc.xpath(xPath + '/tr[2]/td/table/td[2]/ul[2]/li/a').each do |el|
-      @instruments.push(el.content)
+      @instruments.push(el.content.encode('utf-8'))
     end
     
     @styles = Array.new
     doc.xpath(xPath + '/tr[2]/td/table/td[2]/ul[3]/li/a').each do |el|
-      @styles.push(el.content)
+      @styles.push(el.content.encode('utf-8'))
     end
 
     descrNode = doc.xpath(xPath + '/tr[3]/td/pre')[0]
     if descrNode
-      @descr = descrNode.content     
+      @descr = descrNode.content.encode('utf-8')   
     end
     
     @albums = Array.new
@@ -173,11 +173,16 @@ class Album
   def initialize(link)
     @id = link.jazzbaseId
 
+    @dvd = false
+    if link[/\/dvd\//]
+      @dvd = true      
+    end
+
     xPath = '/html/body/table/tr[3]/td[2]/table'
     
     doc = Nokogiri::HTML(open(link))
 
-    @name = doc.xpath(xPath + '/tr[1]/td/h3')[0].content
+    @name = doc.xpath(xPath + '/tr[1]/td/h3')[0].content.encode('utf-8')
 
     yearNode = doc.xpath(xPath + '/tr[2]/td/table/td[2]/ul[2]/li/a')[0]
     if yearNode 
@@ -191,7 +196,7 @@ class Album
     
     descrNode = doc.xpath(xPath + '/tr[3]/td/pre')[0]
     if descrNode
-      @descr = descrNode.content
+      @descr = descrNode.content.encode('utf-8')
     end
   end
 
@@ -199,7 +204,7 @@ class Album
     return @id + ':' + @name + " [" + @year + "]: img = " + @img
   end
 
-  attr_reader :id, :name, :year, :img, :descr
+  attr_reader :id, :name, :year, :img, :descr, :dvd
 end
 
 class String
