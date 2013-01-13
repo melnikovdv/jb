@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require 'nokogiri'
 require 'open-uri'
 require 'yaml'
@@ -64,7 +66,7 @@ class Singers
     time = Time.new
     puts 'saving to file started at ' + time.inspect 
     File.open(YAML_BASE, 'w') do |f|
-      f.puts singers.to_yaml      
+      f.puts singers.to_yaml
     end
     time = Time.new
     puts 'saving to file finished at ' + time.inspect
@@ -135,13 +137,30 @@ class Singer
 
 
     @instruments = Array.new
-    doc.xpath(xPath + '/tr[2]/td/table/td[2]/ul[2]/li/a').each do |el|
-      @instruments.push(el.content.encode('utf-8'))
+    doc.xpath(xPath + '/tr[2]/td/table/td[2]/h4').each do |el|
+      if el.content.eql?('Инструменты')                
+        el.next.next.xpath('li/a').each do |ael|          
+          @instruments.push(ael.content.encode('utf-8'))
+        end
+      end
     end
     
-    @styles = Array.new
-    doc.xpath(xPath + '/tr[2]/td/table/td[2]/ul[3]/li/a').each do |el|
-      @styles.push(el.content.encode('utf-8'))
+    @styles = Array.new    
+    doc.xpath(xPath + '/tr[2]/td/table/td[2]/h4').each do |el|
+      if el.content.eql?('Стили')                
+        el.next.next.xpath('li/a').each do |ael|          
+          @styles.push(ael.content.encode('utf-8'))
+        end
+      end
+    end
+
+    @seealso = Array.new    
+    doc.xpath(xPath + '/tr[2]/td/table/td[2]/h4').each do |el|
+      if el.content.eql?('См. также')                
+        el.next.next.xpath('li/a').each do |ael|          
+          @seealso.push(ael[:href].jazzbaseId)
+        end
+      end
     end
 
     descrNode = doc.xpath(xPath + '/tr[3]/td/pre')[0]
@@ -149,10 +168,14 @@ class Singer
       @descr = descrNode.content.encode('utf-8')   
     end
     
-    @albums = Array.new
-    doc.xpath(xPath + '/tr[2]/td/table/td[2]/ul[1]/li/a').each do |el|
-      @albums.push(Album.new(el[:href].subLink))
-    end       
+    @albums = Array.new    
+    doc.xpath(xPath + '/tr[2]/td/table/td[2]/h4').each do |el|
+      if el.content.eql?('Альбомы и DVD')                
+        el.next.next.xpath('li/a').each do |ael|          
+          @albums.push(Album.new(ael[:href].subLink))
+        end
+      end
+    end
 
     @loaded = true               
   end
@@ -165,7 +188,7 @@ class Singer
     return @id + ':' + @name + " [" + @link + "]: img = " + @img
   end
 
-  attr_reader :id, :name, :link, :descr, :img, :albums, :styles, :instruments
+  attr_reader :id, :name, :link, :descr, :img, :albums, :styles, :instruments, :seealso
 end
 
 class Album
