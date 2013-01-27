@@ -1,0 +1,29 @@
+@import url("http://yandex.st/bootstrap/2.2.2/css/bootstrap.min.css");
+
+body {
+  padding-top: 20px;
+  padding-bottom: 40px;
+  background-color:#BFBFBF;
+  font-family: Geneva, Arial, Helvetica, sans-serif;
+}
+
+/* Custom container */
+.container-narrow {
+  margin: 0 auto;
+  max-width: 724px;
+  background-color: #FFFFFF;
+  padding: 30px;
+  border-radius: 5px;
+}
+
+.blue {
+  color: #6FC5FE;
+}
+
+.center {
+  text-align: center;
+}
+
+.font {
+font-family: Geneva, Arial, Helvetica, sans-serif;
+}

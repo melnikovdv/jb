@@ -42,11 +42,11 @@ class Singers
       if !singer
         singer = Singer.new singerLink
         singers.push singer
-        puts i.to_s + ". " + singer.id + ' ' + singer.name + ' was added as new'
+        puts i.to_s + ". " + singer.id + ' ' + singer.name + ' was added as new'        
         if i % 100 == 0
-          Singers.store(singers)
+          Singers.store(singers, YAML_BASE)
         end
-      else
+      else        
         puts i.to_s + ". " + singer.id + ' ' + singer.name + ' was already in the base'
         if !singer.loaded?
           singers.delete singer 
@@ -54,18 +54,19 @@ class Singers
           singers.push singer
           puts 'not loaded'
         end  
+        singer.checkAlbumsForNew
       end 
       
       i += 1          
     end 
-    Singers.store(singers)
+    Singers.store(singers, YAML_BASE)
     return singers    
   end
 
-  def self.store(singers)
+  def self.store(singers, file)
     time = Time.new
     puts 'saving to file started at ' + time.inspect 
-    File.open(YAML_BASE, 'w') do |f|
+    File.open(file, 'w') do |f|
       f.puts singers.to_yaml
     end
     time = Time.new
@@ -82,7 +83,7 @@ class Singers
       p 'file ' + file + ' not found'
       return nil
     end
-  end
+  end  
 
   def initialize()
     @singers = Array.new      
@@ -177,7 +178,31 @@ class Singer
       end
     end
 
-    @loaded = true               
+    @loaded = true  
+    @addedAsNew = true             
+  end
+
+  def checkAlbumsForNew
+    xPath = '/html/body/table/tr[3]/td[2]/table'
+    doc = Nokogiri::HTML(open(@link))
+    doc.xpath(xPath + '/tr[2]/td/table/td[2]/h4').each do |el|
+      if el.content.eql?('Альбомы и DVD')                
+        el.next.next.xpath('li/a').each do |ael|          
+          id = ael[:href].subLink.jazzbaseId
+          hasAlbum = false
+          @albums.each do |album|
+            if album.id.eql?(id)
+              hasAlbum = true
+            end
+          end
+          unless hasAlbum
+            albumNew = Album.new(ael[:href].subLink)
+            albumNew.addedAsNew = true
+            @albums.push(albumNew) 
+          end
+        end
+      end  
+    end
   end
   
   def loaded?
@@ -189,12 +214,15 @@ class Singer
   end
 
   attr_reader :id, :name, :link, :descr, :img, :albums, :styles, :instruments, :seealso
+  attr_accessor :addedAsNew
 end
 
 class Album
   
   def initialize(link)
     @id = link.jazzbaseId
+
+    @addedAsNew = false
 
     @dvd = false
     if link[/\/dvd\//]
@@ -228,6 +256,7 @@ class Album
   end
 
   attr_reader :id, :name, :year, :img, :descr, :dvd
+  attr_accessor :addedAsNew
 end
 
 class String

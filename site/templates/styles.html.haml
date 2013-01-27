@@ -1,0 +1,9 @@
+%div#styles
+  %ul          
+    - foreach($styles as $key => $s)            
+      %li
+        - if (!isset($pathToStyles))
+          - $pathToStyles = '';
+        - $tmp = $pathToStyles . 'spec-search?style=' . $s->getName();
+        %a{:href => $tmp }= $s->getName() 
+        = parenthesise($s->getCount())

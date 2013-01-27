@@ -1,0 +1,32 @@
+!!! 5
+%html
+  %head  
+    %title= title('Форма заказа')       
+    = $app->render('header-common.html.haml')
+  %body
+    %div.container-narrow
+      = $app->render('search-form.html.haml', array('relPath' => './'))
+    
+      - if (!isset($params))
+        %h3 Форма заказа      
+        %p
+          Для оформления заказа достаточно прислать список понравившихся Вам исполнителей и альбомов, наши менеджеры свяжутся с вами для дальнейшего обсуждения способов доставки и оплаты.
+        = $app->render('feedback-form.html.haml', array())
+
+      - if (isset($params))       
+        - if (count($params['errors']) > 0)          
+
+          - if (isset($params) && (count($params['errors']) > 0))
+            %div.alert.alert-error
+              %ul.unstyled
+                %li 
+                  %span.label.label-important Ошибка!                
+
+                - foreach($params['errors'] as $v)
+                  %li= $v    
+
+          = $app->render('feedback-form.html.haml', array('params' => $params))
+
+        - if (count($params['errors']) == 0)
+          %div.alert.alert-success
+            %span.label.label-success Заказ отправлен          

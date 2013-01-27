@@ -1,0 +1,12 @@
+!!! 5
+%html
+  %head
+    %title= title('Cтили')
+    = $app->render('header-common.html.haml')
+  %body    
+    %div.container-narrow
+      = $app->render('search-form.html.haml', array('relPath' => './'))
+    
+      %h3 Все стили         
+      = $app->render('styles.html.haml', array('app' => $app, 'styles' => $styles))
+    %div#footer

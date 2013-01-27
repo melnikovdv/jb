@@ -1,0 +1,24 @@
+!!! 5
+%html
+  %head
+    %title= title('Поиск')
+    = $app->render('header-common.html.haml')
+  %body
+    %div.container-narrow
+      = $app->render('search-form.html.haml', array('relPath' => './'))
+    
+      %p 
+        - if (isset($search))
+          Вы искали: 
+          %span= $search 
+          %br>
+          Найдено:                     
+          = $count
+          
+
+      - if (isset($search))        
+        %b Результаты
+        - if ($singertype)
+          = $app->render('singers.html.haml', array('app' => $app, 'singers' => $singers))  
+        - if (!$singertype)
+          = $app->render('albums.html.haml', array('app' => $app, 'albums' => $albums))  

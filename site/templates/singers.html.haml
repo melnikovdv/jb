@@ -1,0 +1,8 @@
+%div#singers
+  %ul          
+    - foreach($singers as $key => $s)            
+      %li
+        - if (isset($pathToSinger))
+          %a{:href => $s->getLink($pathToSinger)}= $s->getName() 
+        - if (!isset($pathToSinger))
+          %a{:href => $s->getLink()}= $s->getName() 

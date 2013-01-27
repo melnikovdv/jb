@@ -1,0 +1,29 @@
+!!! 5
+%html
+  %head
+    %title= title('Поиск')          
+    = $app->render('header-common.html.haml')
+  %body
+    %div.container-narrow
+      = $app->render('search-form.html.haml', array('relPath' => './'))
+         
+      - if (isset($letter))
+        %h3 
+          Исполнители начинающиеся на 
+          = quote($letter)          
+
+      - if (isset($style))
+        %h3 
+          Исполнители со стилем 
+          = quote($style)
+      
+      - if (isset($instrument))
+        %h3 
+          Инструменты 
+          = quote($instrument)
+          
+      %p 
+        Всего:                     
+          = count($singers)
+                      
+      = $app->render('singers.html.haml', array('app' => $app, 'singers' => $singers))  

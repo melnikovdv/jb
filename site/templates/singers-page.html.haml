@@ -1,0 +1,11 @@
+!!! 5
+%html
+  %head
+    %title= title('Исполнители')
+    = $app->render('header-common.html.haml')
+  %body
+    %div.container-narrow
+      = $app->render('search-form.html.haml', array('relPath' => './'))
+    
+      %h3 Все исполнители                  
+      = $app->render('singers.html.haml', array('app' => $app, 'singers' => $singers))    

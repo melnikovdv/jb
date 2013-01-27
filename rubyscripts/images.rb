@@ -40,7 +40,7 @@ def downloadImages(singers)
   end
 end
 
-singers = Singers.restore(YAML_BASE)
+singers = Singers.restore('26012013.yml')
 puts 'Length of singers array: ' + singers.length.to_s
 
 downloadImages(singers)

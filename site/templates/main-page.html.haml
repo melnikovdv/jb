@@ -1,0 +1,53 @@
+!!! 5
+%html
+  %head
+    %title= title('Коллекция современного джаза, классики, блюза, рок-н-ролла и других направлений')
+    = $app->render('header-common.html.haml')
+  %body  
+      %div.container-narrow        
+        = $app->render('search-form.html.haml', array('relPath' => './'))          
+        
+        %h3= 'Коллекция ' . title();
+        %div.row-fluid
+          %div.span6
+            %img.img-polaroid.pull-left{:src => 'http://boogiewoogie.ru/images/headerpic1.jpg'}
+          %div.span5.offset1          
+            %ul.unstyled
+              / %li
+              /   %h3= 'Коллекция ' . title();
+              %li 
+                %h3.muted современный джаз
+              %li 
+                %h3.muted классика
+              %li 
+                %h3.muted rock'n'roll
+              %li 
+                %h3.muted pop & rock 
+              %li 
+                %h3.muted blues
+        %br/
+        %h5 Вашему вниманию предлагается коллекция CD и DVD современного джаза самых разных направлений.
+
+        %br/
+        %p 
+          Условия доставки и цены в файле 
+          %a{:href => 'fullbase.zip'} fullbase.zip
+          , там же полный список дисков исполнителей джаза, классики, pop&rock музыки.
+        %p
+          Коллекция постоянно пополняется, следите за обновлениями.
+                
+        %p 
+          По вопросам и предложениям можете обращаться по адресу 
+          %a{:href => "mailto:gss@ru.ru"} gss@ru.ru
+
+        %br/        
+        %div.alert.alert-info
+          %span.badge.badge-info
+            Совет
+          Компакты можно заказывать не только в формате СD, но и в APE или FLAC.                                        
+
+        
+        %br/
+        %h5.muted.center © BoogieWoogie.ru, 2013
+
+      

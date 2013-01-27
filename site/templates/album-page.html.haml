@@ -1,0 +1,31 @@
+!!! 5
+%html
+  %head
+    %title= title('Исполнитель: ' . $singer->getName() . ', альбом ' . $album->getName())
+    = $app->render('header-common.html.haml')        
+  %body  	  
+    %div.container-narrow
+      = $app->render('search-form.html.haml', array('relPath' => '../../'))
+  	         
+      %h3
+        Альбом: 
+        = $album->getName()        
+        - if ($album->isDvd())
+          %span.badge.badge-info          
+            dvd
+
+      %p
+        Исполнитель: 
+        %a{:href => $singer->getLink('../../')}= $singer->getName()
+
+      %p
+        Год:  
+        = $album->getYear()
+
+      %div.row-fluid
+        %div.span4                          
+          %img.img-polaroid{:src => $album->getImgLink(), :width => '200'}
+      
+        %div.span8          
+          %pre.font= $album->getDescr()
+    

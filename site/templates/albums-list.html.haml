@@ -1,0 +1,8 @@
+%div#albums
+  %ul          
+    - foreach($albums as $key => $a)
+      %li
+        %a{:href => $a->getLink($pathToAlbum)}= $a->getName()        
+        = parenthesise($a->getYear())
+        - echo '-'
+        = $a->getDescr()

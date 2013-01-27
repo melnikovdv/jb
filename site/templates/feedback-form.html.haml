@@ -1,0 +1,10 @@
+%div      
+  %form{:method => "post", :action => "order"}
+    %label{ :for => 'nameField' } Ваше имя    
+    %input#nameField{ :name => 'name', :type => 'text', :placeholder => 'Остап Бендер', :value => $params['name']}    
+    %label{ :for => 'emailField' } Ваш email    
+    %input#emailField.fbcontrol{ :name => 'email', :type => 'email', :placeholder => 'ostap@email.com', :value => $params['email'] }    
+    %label{ :for => 'orderField' } Описание заказа    
+    %textarea#orderField.input-xxlarge{ :name => 'order', :type => 'text', :rows => "7" }= $params['order']
+    - captcha()        
+    %input.btn{ :name => 'submit', :type => 'submit', :value => 'Отправить' } 

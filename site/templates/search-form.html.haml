@@ -1,0 +1,110 @@
+  %div
+    %ul.nav.nav-pills.pull-right
+      %li
+        %a{:href => $relPath . '.'} 
+          %i.icon-book
+          Магазин
+      %li
+        %a{:href => $relPath . 'order'} 
+          %i.icon-pencil
+          Заказать
+      %li
+        %a{:href => $relPath . 'chatting'} 
+          %i.icon-user
+          Общение    
+      %li
+        %a{:href => 'http://boogiewoogie.ru/'} 
+          %i.icon-home 
+          На главную
+    %h3.muted= title()    
+
+  %div.clearfix
+  %div.center
+    %div#search
+      %form.form-search{ :action => $relPath . 'search', :method => 'post' }
+        %div.input-append
+          %input#searchField.search-query{ :name => 'text', :type => 'text', :placeholder => 'Поиск' }
+          %button.btn{:name => 'submit', :type => 'submit' } Найти
+        %div.clearfix
+        %div
+          %label.radio
+            %input{:name => "type", :type => 'radio', :value => "singer", :checked => "true", :id => 'i1'} по исполнителям     
+          %label.radio
+            %input{:name => "type", :type => 'radio', :value => "album", :id => 'i2' }  по альбомам
+
+  %div.clearfix          
+  %div
+    %ul.nav.nav-tabs
+      %li.dropdown
+        %a.dropdown-toggle{:href => $relPath . 'singers', :data-toggle => 'dropdown'}
+          Исполнители
+          %b.caret
+        %ul.dropdown-menu
+          %li 
+            %a{:href => $relPath . 'singers'} Все исполнители
+          %li.dropdown-submenu
+            %a{:data-toggle => 'dropdown', :tabindex => "-1"} 
+              По алфавиту    
+            %ul.dropdown-menu
+              %li.dropdown
+                %a{:href => $relPath . 'spec-search?letter=A'} A           
+              %li.dropdown
+                %a{:href => $relPath . 'spec-search?letter=B'} B  
+              %li.dropdown      
+                %a{:href => $relPath . 'spec-search?letter=C'} C  
+              %li.dropdown        
+                %a{:href => $relPath . 'spec-search?letter=D'} D  
+              %li.dropdown      
+                %a{:href => $relPath . 'spec-search?letter=E'} E  
+              %li.dropdown      
+                %a{:href => $relPath . 'spec-search?letter=F'} F  
+              %li.dropdown      
+                %a{:href => $relPath . 'spec-search?letter=G'} G  
+              %li.dropdown      
+                %a{:href => $relPath . 'spec-search?letter=H'} H  
+              %li.dropdown      
+                %a{:href => $relPath . 'spec-search?letter=I'} I  
+              %li.dropdown        
+                %a{:href => $relPath . 'spec-search?letter=J'} J  
+              %li.dropdown        
+                %a{:href => $relPath . 'spec-search?letter=K'} K  
+              %li.dropdown        
+                %a{:href => $relPath . 'spec-search?letter=L'} L  
+              %li.dropdown        
+                %a{:href => $relPath . 'spec-search?letter=M'} M  
+              %li.dropdown        
+                %a{:href => $relPath . 'spec-search?letter=N'} N  
+              %li.dropdown        
+                %a{:href => $relPath . 'spec-search?letter=O'} O  
+              %li.dropdown        
+                %a{:href => $relPath . 'spec-search?letter=P'} P  
+              %li.dropdown        
+                %a{:href => $relPath . 'spec-search?letter=Q'} Q  
+              %li.dropdown        
+                %a{:href => $relPath . 'spec-search?letter=R'} R  
+              %li.dropdown        
+                %a{:href => $relPath . 'spec-search?letter=S'} S  
+              %li.dropdown        
+                %a{:href => $relPath . 'spec-search?letter=T'} T  
+              %li.dropdown        
+                %a{:href => $relPath . 'spec-search?letter=U'} U  
+              %li.dropdown        
+                %a{:href => $relPath . 'spec-search?letter=V'} V  
+              %li.dropdown        
+                %a{:href => $relPath . 'spec-search?letter=W'} W  
+              %li.dropdown        
+                %a{:href => $relPath . 'spec-search?letter=X'} X  
+              %li.dropdown        
+                %a{:href => $relPath . 'spec-search?letter=Y'} Y  
+              %li.dropdown        
+                %a{:href => $relPath . 'spec-search?letter=Z'} Z  
+      %li
+        %a{:href => $relPath . 'albums'} Альбомы
+      %li
+        %a{:href => $relPath . 'dvd'} DVD 
+      %li
+        %a{:href => $relPath . 'styles'} Стили 
+      %li
+        %a{:href => $relPath . 'instruments'} Инструменты                        
+      
+                

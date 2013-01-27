@@ -1,0 +1,42 @@
+!!! 5
+%html
+  %head
+    %title= title('Исполнитель ' . $singer->getName())
+    = $app->render('header-common.html.haml')    
+  %body
+    %div.container-narrow
+      = $app->render('search-form.html.haml', array('relPath' => './../'))  
+
+    	%h3= $singer->getName()
+    	%div.row-fluid
+        %div.span4
+          %img.img-polaroid{:src => $singer->getImgLink(), :width => '200px'}
+      	%div.span8
+          %pre.font= $singer->getDescr()      
+      
+      %div.clearfix
+      
+      %div.row-fluid
+        %div.span6
+          %h3 Альбомы
+          = $app->render('albums.html.haml', array('app' => $app, 'albums' => $albums, 'pathToAlbum' => './'))  
+
+        %div.span6
+          -if (count($styles) > 0)
+            %h3 Стили
+            = $app->render('styles.html.haml', array('app' => $app, 'styles' => $styles, 'pathToStyles' => '../'))
+
+          -if (count($instruments) > 0)
+            %h3 Инструменты
+            = $app->render('instruments.html.haml', array('app' => $app, 'instruments' => $instruments, 'pathToInstruments' => '../'))
+
+          - if (count($seealso) > 0)
+            %h3 См. также
+            = $app->render('singers.html.haml', array('app' => $app, 'singers' => $seealso, 'pathToSinger' => '../'))  
+
+        
+
+
+  
+    
+                

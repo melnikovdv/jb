@@ -1,0 +1,12 @@
+!!! 5
+%html
+  %head
+    %title= title('Инструменты')
+    = $app->render('header-common.html.haml')
+  %body
+    %div.container-narrow   
+      = $app->render('search-form.html.haml', array('relPath' => './'))
+    
+      %h3 Все инструменты         
+      = $app->render('instruments.html.haml', array('app' => $app, 'styles' => $instruments))
+    

@@ -1,0 +1,9 @@
+%div#instruments
+  %ul          
+    - foreach($instruments as $key => $s)            
+      %li
+        - if (!isset($pathToInstruments))
+          - $pathToInstruments = '';
+        - $tmp = $pathToInstruments . 'spec-search?instrument=' . $s->getName();
+        %a{:href => $tmp }= $s->getName() 
+        = parenthesise($s->getCount())

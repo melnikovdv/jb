@@ -1,0 +1,24 @@
+!!! 5
+%html
+  %head
+    - if ($type == 0)
+      %title= title('Все альбомы')
+    - if ($type == 1)    
+      %title= title('Все DVD')
+
+    = $app->render('header-common.html.haml')
+  %body
+    %div.container-narrow   
+      = $app->render('search-form.html.haml', array('relPath' => './'))
+    
+      - if ($type == 0)
+        %h3 Все альбомы
+      - if ($type == 1)
+        %h3 Все DVD
+      
+      %p
+        Всего:
+        = count($albums)
+
+      = $app->render('albums-list.html.haml', array('app' => $app, 'albums' => $albums, 'pathToAlbum' => './singers/'))
+    %div#footer

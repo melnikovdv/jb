@@ -4,7 +4,7 @@ DROP TABLE styles;
 DROP TABLE instruments;
 DROP TABLE singer_styles;
 DROP TABLE singer_instruments;
-DROP TABLE see_also_singers;
+DROP TABLE singers_see_also;
 
 CREATE TABLE singers(
   sgr_id      INT AUTO_INCREMENT NOT NULL,

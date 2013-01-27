@@ -1,0 +1,10 @@
+%div#albums
+  %ul          
+    - foreach($albums as $key => $a)
+      %li
+        - if ($a->isDvd())
+          %span.badge.badge-info          
+            dvd
+        %a{:href => $a->getLink($pathToAlbum)}= $a->getName()
+        = parenthesise($a->getYear())
+        
